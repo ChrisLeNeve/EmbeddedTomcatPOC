@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
+import servlet.MainServlet;
 
 /**
  *
@@ -20,23 +21,16 @@ import org.apache.catalina.startup.Tomcat;
  */
 public class Main {
     public static void main(String[] args) throws LifecycleException {
-        System.out.println("Hello world!");
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(8083);
         
         Context ctx = tomcat.addContext("/", new File(".").getAbsolutePath());
         
-        tomcat.addServlet(ctx, "Embedded", new HttpServlet() {
-            @Override
-            protected void service(HttpServletRequest req, HttpServletResponse res) throws IOException {
-                Writer w = res.getWriter();
-                w.write("<!DOCTYPE html><html><head><title>Chris rox</title></head><body>hello world!</body></html>");
-                w.flush();
-                w.close();
-            }
-        });
+        //Register a servlet to our Tomcat instance...
+        tomcat.addServlet(ctx, "My servlet name", new MainServlet());
         
-        ctx.addServletMapping("/*", "Embedded");
+        //... and map that servlet to every request that comes in.
+        ctx.addServletMapping("/*", "My servlet name");
         
         tomcat.start();
         tomcat.getServer().await();
